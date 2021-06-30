@@ -1,5 +1,6 @@
 # Ray Optics Visualizer
 
 
-## Flutter app to learn ray optics.
+####
+Flutter app to learn ray optics.
 
