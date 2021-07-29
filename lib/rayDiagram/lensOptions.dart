@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rayoptics/rayDiagram/paintConcave.dart';
-import 'package:rayoptics/rayDiagram/paintConvexLens.dart';
+import 'package:rayoptics/rayDiagram/paintRayDiagram.dart';
 
 class LensOption extends StatefulWidget {
   LensOption({Key? key}) : super(key: key);
@@ -53,11 +52,17 @@ class _LensOptionState extends State<LensOption> {
                           MaterialPageRoute(builder: (context) {
                             switch (lens[item]) {
                               case "Convex Lens":
-                                return PaintConvexLens();
+                                return PaintRayDiagram(
+                                  isConvex: true,
+                                );
                               case "Concave Lens":
-                                return PaintConcaveLens();
+                                return PaintRayDiagram(
+                                  isConvex: false,
+                                );
                               default:
-                                return PaintConvexLens();
+                                return PaintRayDiagram(
+                                  isConvex: true,
+                                );
                             }
                           }),
                         );

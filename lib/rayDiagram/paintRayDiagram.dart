@@ -1,13 +1,17 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import '/rayDiagram/displayData.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-class PaintConcaveLens extends StatefulWidget {
-  PaintConcaveLens({Key? key}) : super(key: key);
+import 'displayData.dart';
+
+class PaintRayDiagram extends StatefulWidget {
+  @required
+  final isConvex;
+  PaintRayDiagram({this.isConvex});
 
   @override
-  _PaintConcaveLensState createState() => _PaintConcaveLensState();
+  _PaintRayDiagramState createState() => _PaintRayDiagramState();
 }
 
 int u = 10;
@@ -17,7 +21,14 @@ double h1 = 50.0;
 double h2 = 50.0;
 double objectd = u.toDouble();
 
-class _PaintConcaveLensState extends State<PaintConcaveLens> {
+class _PaintRayDiagramState extends State<PaintRayDiagram> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     double swidth = (MediaQuery.of(context).size.width);
@@ -25,7 +36,9 @@ class _PaintConcaveLensState extends State<PaintConcaveLens> {
     double max = swidth < 640 ? swidth / 2 - 20 : swidth / 2 - 40;
     objectd = -(swidth / 2 - u);
 
-    double vInverse = (-1 / f + 1 / (objectd.toInt()));
+    double vInverse = widget.isConvex
+        ? (1 / f + 1 / (objectd.toInt()))
+        : (-1 / f + 1 / (objectd.toInt()));
 
     v = 1 / vInverse;
     //handling infinity error
@@ -36,6 +49,7 @@ class _PaintConcaveLensState extends State<PaintConcaveLens> {
     //to prevent error due to resizing;
     double _handle_error() {
       setState(() {});
+      print('object');
       u = 10;
       return u.toDouble();
     }
@@ -44,9 +58,8 @@ class _PaintConcaveLensState extends State<PaintConcaveLens> {
       child: Scaffold(
         appBar: PreferredSize(
           child: AppBar(
-            title:
-                Text('Concave lens', style: TextStyle(fontFamily: 'aileron')),
-          ),
+              title:
+                  Text('Convex lens', style: TextStyle(fontFamily: 'aileron'))),
           preferredSize: Size(swidth, 50),
         ),
         body: Transform.scale(
@@ -68,7 +81,7 @@ class _PaintConcaveLensState extends State<PaintConcaveLens> {
                     ),
                     child: ClipRRect(
                       child: CustomPaint(
-                        painter: RayPaint(),
+                        painter: RayPaint(drawConvex: widget.isConvex),
                         size: Size.infinite,
                       ),
                     ),
@@ -226,6 +239,8 @@ class _PaintConcaveLensState extends State<PaintConcaveLens> {
 }
 
 class RayPaint extends CustomPainter {
+  final drawConvex;
+  RayPaint({this.drawConvex});
   @override
   void paint(Canvas canvas, Size size) {
     //image distance
@@ -254,36 +269,56 @@ class RayPaint extends CustomPainter {
     var objectBase = Offset(u.toDouble(), size.height / 2);
     var objectTop = Offset(u.toDouble(), size.height / 2 - h1);
     canvas.drawLine(objectBase, objectTop, paintObejct);
-    //paint image
+
     var paintImage = Paint()
       ..color = Colors.white
       ..strokeWidth = 1.5
       ..strokeJoin = StrokeJoin.bevel
       ..strokeCap = StrokeCap.round;
-    ;
+
     var imagep1 = Offset(size.width / 2 + v, size.height / 2);
     var imagep2 = Offset(size.width / 2 + v, size.height / 2 - h2);
     canvas.drawLine(imagep1, imagep2, paintImage);
 
-    //draw lens
-    Paint paint_0 = new Paint()
-      ..color = Color.fromARGB(180, 33, 150, 243)
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 1;
-    //draw lens
-    Path path_0 = Path();
-    path_0.moveTo(size.width * 0.5425000, size.height * 0.7157143);
-    path_0.quadraticBezierTo(size.width * 0.5050000, size.height * 0.5053571,
-        size.width * 0.5416667, size.height * 0.2857143);
-    path_0.quadraticBezierTo(size.width * 0.5210417, size.height * 0.2860714,
-        size.width * 0.4591667, size.height * 0.2871429);
-    path_0.quadraticBezierTo(size.width * 0.5043750, size.height * 0.5064286,
-        size.width * 0.4575000, size.height * 0.7142857);
-    path_0.quadraticBezierTo(size.width * 0.4775000, size.height * 0.7157143,
-        size.width * 0.5425000, size.height * 0.7157143);
-    path_0.close();
+    if (drawConvex) {
+      //paint convex lens
+      Paint paint_0 = new Paint()
+        ..color = Color.fromARGB(180, 33, 196, 243)
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 1;
+      //draw convex lens
+      Path path_0 = Path();
+      path_0.moveTo(size.width * 0.4991667, size.height * 0.2857143);
+      path_0.quadraticBezierTo(size.width * 0.5287500, size.height * 0.3860714,
+          size.width * 0.5283333, size.height * 0.4985714);
+      path_0.quadraticBezierTo(size.width * 0.5297917, size.height * 0.6135714,
+          size.width * 0.5000000, size.height * 0.7157143);
+      path_0.quadraticBezierTo(size.width * 0.4737500, size.height * 0.6135714,
+          size.width * 0.4733333, size.height * 0.4985714);
+      path_0.quadraticBezierTo(size.width * 0.4735417, size.height * 0.3860714,
+          size.width * 0.4991667, size.height * 0.2857143);
+      path_0.close();
+      canvas.drawPath(path_0, paint_0);
+    } else {
+      Paint paint_0 = new Paint()
+        ..color = Color.fromARGB(180, 33, 150, 243)
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 1;
+      //draw lens
+      Path path_0 = Path();
+      path_0.moveTo(size.width * 0.5425000, size.height * 0.7157143);
+      path_0.quadraticBezierTo(size.width * 0.5050000, size.height * 0.5053571,
+          size.width * 0.5416667, size.height * 0.2857143);
+      path_0.quadraticBezierTo(size.width * 0.5210417, size.height * 0.2860714,
+          size.width * 0.4591667, size.height * 0.2871429);
+      path_0.quadraticBezierTo(size.width * 0.5043750, size.height * 0.5064286,
+          size.width * 0.4575000, size.height * 0.7142857);
+      path_0.quadraticBezierTo(size.width * 0.4775000, size.height * 0.7157143,
+          size.width * 0.5425000, size.height * 0.7157143);
+      path_0.close();
 
-    canvas.drawPath(path_0, paint_0);
+      canvas.drawPath(path_0, paint_0);
+    }
 
     //draw focal length
     var f1p1 = Offset(size.width / 2 + f, size.height / 2 - 5);
@@ -331,42 +366,71 @@ class RayPaint extends CustomPainter {
     text2f.paint(
         canvas, Offset(size.width / 2 - 2 * f - 4, size.height / 2 + 10));
 
-    //ray 1
-    var paintRay1 = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 1.5
-      ..strokeJoin = StrokeJoin.bevel
-      ..strokeCap = StrokeCap.round;
-    //ray 2
-    var paintRay2 = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 1.5
-      ..strokeJoin = StrokeJoin.bevel
-      ..strokeCap = StrokeCap.round;
-    //points for ray 1
-    var ray1Points = [
-      Offset(u.toDouble(), size.height / 2 - h1),
-      Offset(size.width / 2, size.height / 2 - h1),
-    ];
-    canvas.drawPoints(PointMode.polygon, ray1Points, paintRay1);
-    //extended line
-    var paintRay1extended = Paint()..color = Colors.white;
-    var raypoint1 = Offset(size.width / 2 - f, size.height / 2);
-    var raypoint2 =
-        Offset(size.width, size.height / 2 - (h1 * (f + size.width / 2)) / f);
-    canvas.drawLine(raypoint1, raypoint2, paintRay1extended);
-    //points for ray 2
-    var ray2Points = [
-      Offset(u.toDouble(), size.height / 2 - h1),
-      Offset(size.width / 2, size.height / 2),
-      Offset(size.width / 2 + v, size.height / 2 - h2)
-    ];
-    canvas.drawPoints(PointMode.polygon, ray2Points, paintRay2);
+    if (drawConvex) {
+      //ray1 and ray2 style
+      var paintRay1 = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..strokeJoin = StrokeJoin.bevel
+        ..strokeCap = StrokeCap.round;
+      var paintRay2 = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..strokeJoin = StrokeJoin.bevel
+        ..strokeCap = StrokeCap.round;
+      //defining ray1 and ray2 co-ordinates
+      var ray1Points = [
+        Offset(u.toDouble(), size.height / 2 - h1),
+        Offset(size.width / 2, size.height / 2 - h1),
+        Offset(size.width / 2 + f, size.height / 2),
+        Offset(size.width / 2 + v, size.height / 2 - h2),
+      ];
+      canvas.drawPoints(PointMode.polygon, ray1Points, paintRay1);
+      var ray2Points = [
+        Offset(u.toDouble(), size.height / 2 - h1),
+        Offset(size.width / 2, size.height / 2),
+        Offset(size.width / 2 + v, size.height / 2 - h2)
+      ];
+      canvas.drawPoints(PointMode.polygon, ray2Points, paintRay2);
+    } else {
+//ray 1
+      var paintRay1 = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..strokeJoin = StrokeJoin.bevel
+        ..strokeCap = StrokeCap.round;
+      //ray 2
+      var paintRay2 = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..strokeJoin = StrokeJoin.bevel
+        ..strokeCap = StrokeCap.round;
+      //points for ray 1
+      var ray1Points = [
+        Offset(u.toDouble(), size.height / 2 - h1),
+        Offset(size.width / 2, size.height / 2 - h1),
+      ];
+      canvas.drawPoints(PointMode.polygon, ray1Points, paintRay1);
+      //extended line
+      var paintRay1extended = Paint()..color = Colors.white;
+      var raypoint1 = Offset(size.width / 2 - f, size.height / 2);
+      var raypoint2 =
+          Offset(size.width, size.height / 2 - (h1 * (f + size.width / 2)) / f);
+      canvas.drawLine(raypoint1, raypoint2, paintRay1extended);
+      //points for ray 2
+      var ray2Points = [
+        Offset(u.toDouble(), size.height / 2 - h1),
+        Offset(size.width / 2, size.height / 2),
+        Offset(size.width / 2 + v, size.height / 2 - h2)
+      ];
+      canvas.drawPoints(PointMode.polygon, ray2Points, paintRay2);
+    }
+
     //text painter
     var objectText = TextPainter(
       text: TextSpan(
         text: 'Object',
-        style: TextStyle(fontFamily: 'productSans', color: Colors.white),
+        style: TextStyle(color: Colors.white, fontFamily: 'productSans'),
       ),
       textDirection: TextDirection.ltr,
     );
@@ -376,7 +440,7 @@ class RayPaint extends CustomPainter {
     var imageText = TextPainter(
       text: TextSpan(
         text: 'Image',
-        style: TextStyle(fontFamily: 'productSans', color: Colors.white),
+        style: TextStyle(color: Colors.white, fontFamily: 'productSans'),
       ),
       textDirection: TextDirection.ltr,
     );
